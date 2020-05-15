@@ -1,0 +1,1851 @@
+package application;
+
+import service_layer_players.Player;
+
+public abstract class ActualPlayer {
+
+	private static Player actual;
+	
+	public static void set(Player p) {
+		actual = p;
+	}
+	
+	public static Player get() {
+		return actual;
+	}	
+}
+package service_layer_cards;
+
+public abstract class Card {
+
+	private static int counter = -1;
+	protected int cardID;
+	protected CardType cardType;
+		
+	/**
+	 * Letrehoz egy Card-ot, es ad neki egy ID-t, melyet a getCardID() metodussal kerhetunk le.
+	 */
+	
+	public Card() {
+		this.cardType = CardType.EMPTY;
+		counter++;
+		cardID = counter;
+	}
+	
+	/**
+	 * Visszaadja egy kartya tipusat (Enum).
+	 * @return kartya tipusa
+	 */
+	public CardType getCardType() {
+		return cardType;
+	}
+
+	/**
+	 * Visszaadja egy kartya szemelyes azonositojat, amellyel hivatkozni lehet ra.
+	 */
+	public int getCardID() {
+		return cardID;
+	}
+	
+	/**
+	 * Elolrol kezdi a lapok szamozasat.
+	 */
+	public static void setCounterBack() {
+		counter = -1;
+	}
+}
+package tests;
+
+import java.util.ArrayList;
+
+import org.junit.jupiter.api.Test;
+
+import service_layer_cards.Card;
+import service_layer_cards.LockCard;
+import service_layer_cards.MapCard;
+import service_layer_cards.OpenCard;
+import service_layer_cards.WayCard;
+
+class CardTest {
+
+	@Test
+	void test() {
+		
+		ArrayList<Card> cards = new ArrayList<Card>();
+		
+		cards.add(new WayCard(1));
+		cards.add(new MapCard());
+		cards.add(new WayCard(5));
+		cards.add(new LockCard());
+		cards.add(new WayCard(3));
+		cards.add(new WayCard(1));
+		cards.add(new OpenCard());
+		cards.add(new WayCard(7));
+		cards.add(new WayCard(6));
+		
+		for (Card cd : cards) {
+			if(cd.getClass() == (new WayCard()).getClass()) {
+				WayCard wc = (WayCard) cd;
+				System.out.println(wc.getWayCardType());
+				
+			}
+			else System.out.println(cd.getCardType());
+		}
+	}
+	
+	
+	
+
+}
+package service_layer_cards;
+
+public enum CardType {
+
+	WAYCARD, ACTIONCARD, EMPTY, GOLD, STONE, START, MAP, LOCK, OPEN
+	
+}
+package service_layer_physics;
+
+import java.util.ArrayList;
+import java.util.Random;
+
+import service_layer_cards.Card;
+import service_layer_cards.WayCard;
+
+public class Deck {
+
+	protected static ArrayList<Card> cardDeck = new ArrayList<Card>();
+
+	public static void fillTheDeckWithBasic() {
+		
+		for(int i = 0; i < 5; i++)
+			Deck.fillTheDeck(new WayCard(1));
+		
+		for(int i = 0; i < 5; i++)
+			Deck.fillTheDeck(new WayCard(2));
+		
+		for(int i = 0; i < 5; i++)
+			Deck.fillTheDeck(new WayCard(3));
+		
+		for(int i = 0; i < 5; i++)
+			Deck.fillTheDeck(new WayCard(4));
+		
+		for(int i = 0; i < 5; i++)
+			Deck.fillTheDeck(new WayCard(5));
+		
+		for(int i = 0; i < 5; i++)
+			Deck.fillTheDeck(new WayCard(6));
+		
+		for(int i = 0; i < 5; i++)
+			Deck.fillTheDeck(new WayCard(7));
+	}
+	
+	
+/*
+ * Megkap egy Card-ot es ezt belerakja a pakliba.
+ */
+	public static void fillTheDeck(Card cd) {
+		cardDeck.add(cd);
+	}
+	
+/*
+ * Kidobja a paklit, ures pakli listat kapunk.
+ */
+	public static void cleanTheDeck() {
+		cardDeck.clear();
+	}
+	
+/*
+ * Egy veletlen lapot huzhatunk a paklibol.
+ */
+	public static Card getRandCard(){
+
+		Random rn = new Random();
+		
+		if(cardDeck.size() > 0) {
+			int choosenOne = 0 + rn.nextInt(cardDeck.size());
+			Card cd = cardDeck.get(choosenOne);
+			cardDeck.remove(cardDeck.get(choosenOne));			
+			return cd;
+		}
+		return null;
+	}
+
+/*
+ * Visszakapjuk az egesz pakli kartyat, lista formatumban.
+ */
+	public static ArrayList<Card> getTheDeck(){
+		return cardDeck;
+	}
+	
+/*
+ * Visszakapjuk hany kartya van a pakliban.
+ */
+	public static int getDeckSize() {
+		return cardDeck.size();
+	}
+}package tests;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
+import java.util.ArrayList;
+
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
+
+import service_layer_cards.Card;
+import service_layer_cards.WayCard;
+import service_layer_physics.Deck;
+
+
+
+class DeckTest {
+	
+	static Deck d;
+	
+	@BeforeAll
+	static void initialize() {
+		d = new Deck();
+	}
+	
+	@Test
+	public void testDeckFill() {
+		Deck.cleanTheDeck();
+		Card.setCounterBack();
+		Deck.fillTheDeck(new WayCard()); //ID 0
+		Deck.fillTheDeck(new WayCard()); //ID 1
+		Deck.fillTheDeck(new WayCard()); //ID 2
+		assertEquals(Deck.getTheDeck().size(), 3, "AnnyiElemVanAPaklibanAmennyitBeleraktunk");
+	}
+	
+	@Test
+	public void putCardFromDeckCardNumCheck() {
+		Deck.cleanTheDeck();
+		Card.setCounterBack();
+		Deck.fillTheDeck(new WayCard()); //ID 0
+		Deck.fillTheDeck(new WayCard()); //ID 1
+		Deck.fillTheDeck(new WayCard()); //ID 2
+		Deck.getRandCard();
+		assertEquals(Deck.getTheDeck().size(), 2, "KivettunkEgyElemet");
+		Deck.getRandCard();
+		assertEquals(Deck.getTheDeck().size(), 1, "KivettunkKetElemet");
+		Deck.getRandCard();
+		assertEquals(Deck.getTheDeck().size(), 0, "KivettunkMindenElemet");
+		Deck.getRandCard();
+		assertEquals(Deck.getTheDeck().size(), 0, "TobbElemetVettunkKiMintAmiBenneVolt");
+	}
+	
+	@Test
+	public void checkIDIfPutCardFromDeck() {
+		Deck.cleanTheDeck();
+		Card.setCounterBack();
+		Deck.fillTheDeck(new WayCard()); //ID 0
+		Deck.fillTheDeck(new WayCard()); //ID 1
+		Deck.fillTheDeck(new WayCard()); //ID 2
+		
+		Card cd = Deck.getRandCard();
+		ArrayList<Card> li = Deck.getTheDeck();
+		assertEquals(!li.contains(cd), true, "NemTartalmazzaAPakliAKivettLapot");	
+	}
+}
+package service_layer_cards;
+
+public class DestroyCard extends Card {
+
+}
+package service_layer_players;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+
+public abstract class  DwarfNames {
+
+	private static ArrayList<String> oldDwarfNames = new ArrayList<>(
+			Arrays.asList("Balin","Bifur","Bofur","Bombur","Dori","Dwalin","Fíli","Glóin","Kíli","Thorin","Óin","Ori","Nori"));
+	private static ArrayList<String> dwarfNames = new ArrayList<>(
+			Arrays.asList("Balin","Bifur","Bofur","Bombur","Dori","Dwalin","Fíli","Glóin","Kíli","Thorin","Óin","Ori","Nori"));
+	
+	public static String getRandNameFromList() {
+		int max = dwarfNames.size();
+		int min = 0;
+		
+		int random = ((int) (Math.random() * max))+min;
+		String name = dwarfNames.get(random);
+		dwarfNames.remove(random);
+		
+		return name;
+	}
+	
+	public static void fillNamesAgain() {
+		
+		dwarfNames = oldDwarfNames;
+	}
+}
+package service_layer_physics;
+
+import java.util.ArrayList;
+import java.util.Random;
+
+import service_layer_players.DwarfNames;
+import service_layer_players.Goldminer;
+import service_layer_players.Player;
+import service_layer_players.Saboteur;
+
+public class Game {
+
+	private static int playerNum = 0;
+	private static int maxCardsInHand = 0;
+	private static ArrayList<Player> players = new ArrayList<Player>();
+	
+/**
+ * Ez a metodus megkap ket integer parametert, ami alapjan eldonti hogy hogy lesz osszeallitva a csapat.
+ * A jatek izgalom faktorahoz tartozik, hogy nem tudjuk pontosan hany saboteur van.
+ * @param saboteurs Max saboteur-ok szama.
+ * @param goldminers Max goldminer-ek szama.
+ */
+	private static void setTheProportion(int saboteurs, int goldminers) {
+		
+		ArrayList<Player> fictionalPlayers = new ArrayList<Player>();
+		
+		for(int i = 0; i < saboteurs; i++) {
+			Saboteur s = new Saboteur();
+			s.setDwarfName(DwarfNames.getRandNameFromList());
+			fictionalPlayers.add(s);
+		}
+		
+		for(int i = 0; i < goldminers; i++) {
+			Goldminer s = new Goldminer();
+			s.setDwarfName(DwarfNames.getRandNameFromList());
+			fictionalPlayers.add(s);
+		}
+
+		Random rnd = new Random();
+
+		for(int i = 0; i < playerNum; i++) {
+			int choosenNum = rnd.nextInt(fictionalPlayers.size());
+			Player plyr = fictionalPlayers.get(choosenNum);
+			players.add(plyr);
+			
+			fictionalPlayers.remove(plyr);
+		}
+	}
+	
+/**
+ * Ezzel a metodussal kerhetjuk le a jatekosok tipusat.
+ */
+	public static void printPlayersType() {
+		int count = 0;
+		for (Player player : players) {
+			count++;
+			System.out.println("Jatekos_" + count + ": " + player.getType());
+		}
+	}
+	
+/**
+ * Ez a metodus feltolti a players listat, ugyelve a jatekos-tipusok aranyara.
+ */
+	public static void fillPlayers() {
+	
+		switch (playerNum) {
+		case 3:
+				setTheProportion(1, 3);
+			break;
+		case 4:
+				setTheProportion(1, 4);
+			break;
+		case 5:
+				setTheProportion(2, 4);
+			break;
+		case 6:
+				setTheProportion(2, 5);
+			break;
+		case 7:
+				setTheProportion(3, 5);
+			break;
+		case 8:
+				setTheProportion(3, 6);
+			break;
+		case 9:
+				setTheProportion(3, 7);
+			break;
+		case 10:
+				setTheProportion(4, 7);
+			break;
+		}	
+	}
+		
+/**
+ * A metodus kitorli a jatekosokat.
+ */
+	public static void clearPlayers() {
+		players.clear();
+	}
+	
+/**
+ * Visszaadja a jatekosok szamat.
+ * @return Jatekosok szamat adja vissza.
+ */
+	public static int getPlayerNum () {
+		return playerNum;
+	}
+
+/**
+ * Visszaad egy listat, ami a jatekosokat tartalmazza.
+ * @return Visszaadott ArrayList
+ */
+	public static ArrayList<Player> getPlayers(){
+		return players;
+	}
+	
+/**
+ * Ezzel a metodussal lehet beallitani hany jatekos jatszik.
+ * Automatikusan meghivja a setCardsInHand() metodust, amely beallitja hany lap lehet a kezunkben.
+ * @param num A jatekosok szamat adja meg.
+ */
+	public static void setPlayerNum (int num) {
+		playerNum = num;
+		setCardsInHand();
+	}
+	
+/*
+ * Ez a metodus visszaadja a kezben tarthato kartyak maximalis szamat.
+ * Ha a pakliban van meg lap, akkor kotelezo hogy a kezben maximalis szamu lap legyen.	
+ */
+	public static int getMaxCardsInHand() {
+		return maxCardsInHand;
+	}
+
+/**
+ * Beallitja a kezben tarthato lapok szamat a jatekosok szama alapjan.
+ */
+	private static void setCardsInHand() {
+
+		switch (playerNum) {
+		case 3:
+		case 4:
+		case 5:
+			maxCardsInHand = 6;
+			break;
+		case 6:
+		case 7:
+			maxCardsInHand = 5;
+			break;
+		case 8:
+		case 9:
+		case 10:
+			maxCardsInHand = 4;
+			break;
+		default: {maxCardsInHand = 0;}
+			break;
+		}
+	}
+	
+}package tests;
+
+import static org.junit.jupiter.api.Assertions.*;
+
+
+import org.junit.jupiter.api.Test;
+
+// import java.util.ArrayList;
+// import service_layer_cards.*;
+import service_layer_physics.*;
+// import service_layer_players.*;
+
+
+class GameTest {
+
+	@Test
+	void testPlayerNumbers() {
+		int handNum = 0;
+		Game.setPlayerNum(2);
+		String problem = "Tul Keves Kartya";
+		assertEquals(Game.getMaxCardsInHand(), handNum, problem);
+		
+		handNum = 6;
+		Game.setPlayerNum(3);
+		problem = "3-ra teszteles";
+		assertEquals(Game.getMaxCardsInHand(), handNum, problem);
+		
+		handNum = 6;
+		Game.setPlayerNum(5);
+		problem = "5-re teszteles";
+		assertEquals(Game.getMaxCardsInHand(), handNum, problem);
+		
+		handNum = 5;
+		Game.setPlayerNum(6);
+		problem = "6-ra teszteles";
+		assertEquals(Game.getMaxCardsInHand(), handNum, problem);
+		
+		handNum = 5;
+		Game.setPlayerNum(7);
+		problem = "7-re teszteles";
+		assertEquals(Game.getMaxCardsInHand(), handNum, problem);
+		
+		handNum = 4;
+		Game.setPlayerNum(8);
+		problem = "8-ra teszteles";
+		assertEquals(Game.getMaxCardsInHand(), handNum, problem);
+		
+		handNum = 4;
+		Game.setPlayerNum(10);
+		problem = "10-re teszteles";
+		assertEquals(Game.getMaxCardsInHand(), handNum, problem);
+		
+		handNum = 0;
+		Game.setPlayerNum(11);
+		problem = "11-re teszteles";
+		assertEquals(Game.getMaxCardsInHand(), handNum, problem);
+		
+	}
+	
+	@Test
+	void testPlayerProportion() {
+		/*
+		 * BRUTEFORCE TESZTELVE... Jobb ötletem most nincs :(
+		 */
+		Game.setPlayerNum(10);
+		Game.fillPlayers();
+		Game.printPlayersType();
+	}
+
+}package service_layer_cards;
+
+public class GoldCard extends TargetCard{
+
+	private static GoldCard gc = null;
+	
+	public GoldCard() {
+		super();
+		this.cardType = CardType.GOLD;
+		if(gc == null)
+			gc = this;
+	}
+	
+	public static GoldCard getSingleton() {
+		return gc;
+	}
+}
+package service_layer_players;
+
+public class Goldminer extends Player{
+
+	public Goldminer() {
+		super();
+		this.type = "Goldminer";
+	}
+}package application;
+
+import javafx.scene.control.Button;
+
+public abstract class ImageSetter {
+
+	private static String num1 = "img/1";
+	private static String num2 = "img/2";
+	private static String num3 = "img/3";
+	private static String num4 = "img/4";
+	private static String num5 = "img/5";
+	private static String num6 = "img/6";
+	private static String num7 = "img/7";
+	private static String stone = "img/stone";
+	private static String gold = "img/gold";
+	private static String start = "img/start";
+	private static String empty = "img/empty";
+	
+	public static void setImageInHand(Button b1, String typeStr) {
+        b1.setStyle("-fx-background-image: url('" + getChoosen(typeStr) + ".jpg"+"')");
+
+	}
+	
+	public static void setImageInHand(Button b1, String typeStr, boolean flipped) {
+		if(flipped)
+			b1.setStyle("-fx-background-image: url('" + getChoosen(typeStr) + "_flipped.jpg"+"')");
+		b1.setStyle("-fx-background-image: url('" + getChoosen(typeStr) + ".jpg"+"')");
+	}
+	
+	private static String getChoosen(String str) {
+		
+		String choosen = "";
+		
+		if(str.contains("EMPTY")) {choosen = empty;}
+		if(str.contains("STONE")) { choosen = stone; }
+		if(str.contains("GOLD")) { choosen = gold; }
+		if(str.contains("START")) { choosen = start;}
+		if(str.contains("1")) { choosen = num1; }
+		if(str.contains("2")) { choosen = num2; }
+		if(str.contains("3")) { choosen = num3; }
+		if(str.contains("4")) { choosen = num4; }
+		if(str.contains("5")) { choosen = num5; }
+		if(str.contains("6")) { choosen = num6; }
+		if(str.contains("7")) { choosen = num7; }
+		
+		return choosen;
+	}
+
+	public static void setImageOnTable(Button b1, String typeStr) {
+        b1.setStyle("-fx-background-image: url('" + getChoosen(typeStr) + "_small.jpg" + "')");
+
+	}
+	
+	public static void setImageOnTable(Button b1, String typeStr, boolean flipped) {
+		if(flipped)
+			b1.setStyle("-fx-background-image: url('" + getChoosen(typeStr) + "_small_flipped.jpg" + "')");
+		b1.setStyle("-fx-background-image: url('" + getChoosen(typeStr) + "_small.jpg" + "')");
+
+	}
+}package service_layer_cards;
+
+public class LockCard extends SuckCard{
+
+	public LockCard() {
+		super();
+		this.cardType = CardType.LOCK;
+	}
+}
+package application;
+	
+import javafx.application.Application;
+import javafx.fxml.FXMLLoader;
+import javafx.stage.Stage;
+import javafx.scene.*;
+
+
+public class Main extends Application {
+	@Override
+	public void start(Stage primaryStage) {
+		try {
+			Parent root = FXMLLoader.load(getClass().getResource("View.fxml"));
+			Scene scene = new Scene(root);
+
+			primaryStage.setScene(scene);
+			primaryStage.setResizable(false);
+			primaryStage.show();
+		} catch(Exception e) {
+			e.printStackTrace();
+		}
+	}
+	
+	public static void main(String[] args) {
+		launch(args);
+	}
+}package service_layer_cards;
+
+public class MapCard extends Card{
+
+	/**
+	 * Uj terkep kartyat hoz letre es beallitja a tipusat is.
+	 */
+	public MapCard() {
+		super();
+		
+		this.cardType = CardType.MAP;
+	}
+}package application;
+
+import javafx.scene.control.Button;
+import service_layer_cards.Card;
+import service_layer_cards.CardType;
+import service_layer_cards.WayCard;
+
+public class MyHandElement {
+
+	private Button b;
+	private Card cd;
+	
+	public MyHandElement(Button b, int num) {
+		super();
+		this.b = b;
+		
+		if(num < ActualPlayer.get().getHand().size()) {
+
+			this.cd = ActualPlayer.get().getHand().get(num);
+			setButton();
+			
+			
+			if(cd.getCardType() == CardType.WAYCARD)
+			{
+				WayCard wc = (WayCard) cd;
+				ImageSetter.setImageInHand(b, wc.getWayCardType().toString(), wc.isFlipped());
+			}
+			else {
+				ImageSetter.setImageInHand(b, cd.getCardType().toString());
+			}
+		}
+		else
+			{
+			 this.cd = new WayCard(2);
+			 b.setDisable(true);
+			 //b.setVisible(false);
+			 }
+
+	}
+	
+	private void setButton() {
+		b.setMinSize(240, 160);
+		
+		b.setOnAction((event) -> {
+
+			if(cd.getCardType() == CardType.WAYCARD)
+				{
+				WayCard wc = (WayCard) cd;
+				SelectedWayCard.set(wc);
+				}
+		});
+	}
+	
+	public Button getButton() {
+		return b;
+	}
+}
+package service_layer_cards;
+
+public class OpenCard extends SuckCard{
+
+	
+	public OpenCard() {
+		super();
+		this.cardType = CardType.OPEN;
+	}
+	
+}
+package service_layer_cards;
+
+public enum Orientation {
+
+	
+	UP, DOWN, RIGHT, LEFT
+}
+package service_layer_players;
+
+import java.util.ArrayList;
+
+import service_layer_cards.Card;
+import service_layer_cards.CardType;
+import service_layer_cards.WayCard;
+import service_layer_physics.Deck;
+import service_layer_physics.Game;
+
+public abstract class Player {
+
+	protected static int id = -1;
+
+	private ArrayList<Card> hand = new ArrayList<Card>();
+	protected String type = "None";
+	
+	protected String dwarfName;
+	
+	private ArrayList<String> handByTypes = new ArrayList<String>();
+
+	public String getDwarfName() {
+		return dwarfName;
+	}
+
+	public void setDwarfName(String dwarfName) {
+		this.dwarfName = dwarfName;
+	}
+
+	/*
+ * Letrehoz egy uj jatekost, es ID-t rendel hozza.
+ */
+	public Player() {
+		id++;
+	}
+	
+	
+	public void flipAll() {
+		for (Card card : hand) {
+			if(card.getCardType() == CardType.WAYCARD)
+				{ WayCard wc = (WayCard) card;
+				  wc.flip();}
+		}	
+	}
+	
+/*
+ * Visszaadja egy jatekos kezeben levo kartyakat lista formatumban.
+ */
+	public ArrayList<Card> getHand(){
+		return hand;
+	}
+
+
+	public ArrayList<String> getHandByTypes(){
+		
+		for (Card cd : hand) {
+			if(cd.getClass() == (new WayCard()).getClass()) {
+				WayCard wc = (WayCard) cd;
+				handByTypes.add("" + wc.getWayCardType());
+			}
+			else handByTypes.add("" + cd.getCardType());
+		}
+		return handByTypes;
+	}
+	
+/*
+ * Visszaad egy kartyat a kezbol (az indexevel kell ra hivatkozni).
+ */
+	public Card getOneCardFromHand(int indexOfCard) {
+		return hand.get(indexOfCard);
+	}
+	
+/*
+ * Egy kartya hasznalata (visszaadja + kiveszi a kezbol).	
+ */
+	public Card useOneCardFromHand(int indexOfCard) {
+		Card used = hand.get(indexOfCard);
+		hand.remove(indexOfCard);
+		return used;
+	}
+	
+	public Card useOneCardFromHand(Card cd) {
+		Card used = cd;
+		hand.remove(cd);
+		return used;
+	}
+	
+/*
+ * Minden lapot eldobunk a kezbol, ures kezet csinal.
+ */
+	public void cleanHand() {
+		hand.clear();
+	}
+	
+/*
+ * Visszaadja hogy egy jatekos saboteur vagy aranyaso-e.
+ */
+	public String getType() {
+		return type;
+	}
+	
+/*
+ * Huzunk egy lapot egy paklibol (Deck), es a kezunkbe vesszuk.
+ */
+	public Card pickACard() {
+		if(hand.size() < Game.getMaxCardsInHand() && Deck.getDeckSize() > 0) {
+						Card cd = Deck.getRandCard();
+						hand.add(cd);
+						return cd;
+				}
+		else return null;
+	}
+	
+/*
+ * A jatek elejen automatikusan kioszt a kezunkbe annyi lapot, ahany a jatekosok szama szerint maximalisan a kezunkben lehet.
+ */
+	public void setHand() {
+				for(int i = 0; i < Game.getMaxCardsInHand(); i++)
+				{
+					hand.add(Deck.getRandCard());
+				}	
+		}
+}package tests;
+
+import static org.junit.jupiter.api.Assertions.*;
+
+import java.util.ArrayList;
+
+import org.junit.Before;
+import org.junit.jupiter.api.Test;
+
+import service_layer_cards.WayCard;
+import service_layer_physics.Deck;
+import service_layer_physics.Game;
+import service_layer_players.Goldminer;
+import service_layer_players.Player;
+import service_layer_players.Saboteur;
+
+class PlayerTest {
+
+	Player p1 = new Saboteur();
+	Player p2 = new Saboteur();
+	Player p3 = new Goldminer();
+	
+	@Before
+	void beforeTest() {
+	}
+
+	@Test
+	void testSetHand() {
+		Game.clearPlayers();
+		Game.setPlayerNum(4);
+		
+		Deck.cleanTheDeck();
+		p1.cleanHand();
+
+		Deck.fillTheDeck(new WayCard(1)); // ID 0
+		Deck.fillTheDeck(new WayCard(2)); // ID 1
+		Deck.fillTheDeck(new WayCard(5)); // ID 2
+		Deck.fillTheDeck(new WayCard(2)); // ID 3
+		Deck.fillTheDeck(new WayCard(7)); // ID 4
+		Deck.fillTheDeck(new WayCard(6)); // ID 5
+		Deck.fillTheDeck(new WayCard(5)); // ID 6
+		Deck.fillTheDeck(new WayCard(3)); // ID 7
+		p1.setHand();
+
+		assertEquals(Deck.getDeckSize(), 2, "SetTheHand");
+	}
+	
+	@Test
+	void handTestByType() {
+		Game.clearPlayers();
+		Game.setPlayerNum(4);
+		
+		Deck.cleanTheDeck();
+		p1.cleanHand();
+
+		Deck.fillTheDeck(new WayCard(1)); // ID 0
+		Deck.fillTheDeck(new WayCard(2)); // ID 1
+		Deck.fillTheDeck(new WayCard(5)); // ID 2
+		Deck.fillTheDeck(new WayCard(2)); // ID 3
+		Deck.fillTheDeck(new WayCard(7)); // ID 4
+		Deck.fillTheDeck(new WayCard(6)); // ID 5
+		Deck.fillTheDeck(new WayCard(5)); // ID 6
+		Deck.fillTheDeck(new WayCard(3)); // ID 7
+		p1.setHand();
+
+		ArrayList<String> myHand = p1.getHandByTypes();
+
+		assertEquals(myHand.get(0).toString().contains("TYPE"), true , "A kezben utkartyak vannak" );	
+	}
+	
+	@Test
+	void moreThanOnePlayer() {
+		Game.clearPlayers();
+		Game.setPlayerNum(4);
+		Game.fillPlayers();
+		Deck.cleanTheDeck();
+		p1.cleanHand();
+		
+		for(int i = 0; i < 40; i++) {
+			Deck.fillTheDeck(new WayCard());	
+		}
+
+		int kezdetiPakliSzam = Deck.getDeckSize();
+		
+		ArrayList<Player> plyr = Game.getPlayers();
+				
+		for (Player actualPlayer : plyr) {
+			System.out.println(actualPlayer.getDwarfName());
+			actualPlayer.setHand();
+		}
+		assertEquals(kezdetiPakliSzam - (4 * 6),
+				     Deck.getDeckSize(),
+				     "Negy jatekos lapokat huz a paklibol.");
+	}
+}
+package service_layer_players;
+
+public class Saboteur extends Player{
+
+	public Saboteur() {
+		super();
+		this.type = "Saboteur";
+	}
+}package application;
+
+import service_layer_cards.WayCard;
+
+public class SelectedWayCard {
+
+	private static WayCard wc;
+	
+	public static void set(WayCard selectedWayCard) {
+		wc = selectedWayCard;
+	}
+	
+	public static WayCard get() {
+		return wc;
+	}
+}package service_layer_cards;
+
+public class StartCard extends WayCard{
+
+	public StartCard() {
+		super();
+		setType(2);
+		this.cardType = CardType.START;
+	}
+}package service_layer_cards;
+
+public class StoneCard extends TargetCard{
+	public StoneCard() {
+		super();
+		this.cardType = CardType.STONE;
+	}
+}
+package service_layer_cards;
+
+public class SuckCard extends Card{
+
+}
+package service_layer_physics;
+
+import java.util.Random;
+import service_layer_cards.GoldCard;
+import service_layer_cards.Orientation;
+import service_layer_cards.StartCard;
+import service_layer_cards.StoneCard;
+import service_layer_cards.WayCard;
+
+public class Table {
+
+	private static WayCard[][] cardTable = new WayCard[5][10];
+
+	/**
+	 * Letrehozza az asztalt a jatek elejen.
+	 */
+	public static void initTable() {
+		Random rnd = new Random();
+		int random = rnd.nextInt(3);
+				
+		for(int oszlop = 0; oszlop < 5; oszlop++) {
+			for(int sor = 0; sor < 10; sor++) {
+				
+				WayCard cd = typeSetter(sor, oszlop, random);
+				//cd.useTheCard(sor, oszlop);
+				cardTable[oszlop][sor] = cd;	
+			}
+		}
+	}
+		
+	/**
+	 * Beallitja hogy hol van arany, es hol van ures kartya.
+	 * @param sor melyik sorba
+	 * @param oszlop melyik oszlopba
+	 * @param random megadja hogy hol az arany
+	 * @return kartya peldany
+	 */
+	private static WayCard typeSetter(int sor, int oszlop, int random) {
+		WayCard cd;
+		
+		if(sor == 1 && oszlop == 2) {
+			cd = new StartCard();
+			return cd;
+		}
+		else if(sor == 9) {
+				if(oszlop == random*2){
+					cd = new GoldCard();
+					return cd;
+					}
+				else if(oszlop == 0 || oszlop == 2 || oszlop == 4){
+					cd = new StoneCard();
+					return cd;
+					}
+			}
+		cd = new WayCard();
+		return cd;
+	}
+	
+	
+	
+	public static WayCard[][] getCardTable() {
+		return cardTable;
+	}
+
+	public static void setCardTable(WayCard[][] cardTable) {
+		Table.cardTable = cardTable;
+	}
+
+	public static WayCard getTableElement(int x, int y) {
+		WayCard cd = cardTable[x][y];
+		return cd;
+	}
+	
+	public static void setTableElement(WayCard wc, int x, int y) {
+		cardTable[x][y] = wc;
+	}
+	
+	public static boolean checkConnection(WayCard wc, int x, int y) {
+		/*
+		if(x>0) {
+			WayCard down = cardTable[x][y-1];
+			return wc.canConnectTo(down);
+		}
+		if(x<4) {
+			WayCard up = cardTable[x][y+1];
+			return wc.canConnectTo(up);
+		}
+		
+		if(y>0) {
+			WayCard left = cardTable[x-1][y];
+			return wc.canConnectTo(left);
+		}
+		if(y<9) {
+			WayCard right = cardTable[x+1][y];
+			return wc.canConnectTo(right);
+		}*/
+		
+		WayCard wc1 = new WayCard();
+		WayCard wc2 = new WayCard();
+		WayCard wc3 = new WayCard();
+		WayCard wc4 = new WayCard();
+
+		if(y > 0) wc1 = cardTable[x][y-1];
+		if(y < 9) wc2 = cardTable[x][y+1];
+		if(x < 4) wc3 = cardTable[x+1][y];
+		if(x > 0) wc4 = cardTable[x-1][y];
+		
+		
+		if(wc1.canConnectTo(wc, Orientation.DOWN) ||
+		   wc2.canConnectTo(wc, Orientation.UP) ||
+		   wc3.canConnectTo(wc, Orientation.LEFT) ||
+		   wc4.canConnectTo(wc, Orientation.RIGHT))
+			return true;
+		
+		return false;
+	}
+	
+	
+	
+	/**
+	 * Kiirja az asztal tartalmat.
+	 */
+	public static void printTableTypes() {
+		for(int sor = 0; sor < 10; sor++) {
+			System.out.println();
+		for(int oszlop = 0; oszlop < 5; oszlop++) {
+			System.out.print("[" + cardTable[oszlop][sor].getCardType().toString() + "]");
+			System.out.print(" ");
+			}
+		System.out.println();
+		}
+	}
+	
+	public static void printTableCoordinates() {
+		for(int sor = 0; sor < 10; sor++) {
+			System.out.println();
+		for(int oszlop = 0; oszlop < 5; oszlop++) {
+			System.out.print(" ");
+			}
+		System.out.println();
+		}
+	}
+}package tests;
+
+import org.junit.jupiter.api.Test;
+
+import service_layer_physics.Table;
+
+
+class TableTest {
+	
+	@Test
+	void testTableView() {
+		
+		Table.initTable();
+		Table.printTableTypes();		
+	}
+}package service_layer_cards;
+
+public class TargetCard extends WayCard{
+
+	TargetCard(){	
+		setType(2);
+	}
+	
+}
+package application;
+
+import java.net.URL;
+import java.util.ResourceBundle;
+import javafx.event.ActionEvent;
+import javafx.fxml.FXML;
+import javafx.fxml.Initializable;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
+import javafx.scene.image.ImageView;
+import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.GridPane;
+import service_layer_physics.Deck;
+import service_layer_physics.Game;
+import service_layer_physics.Table;
+import service_layer_physics.WinTest;
+import service_layer_players.Player;
+
+public class ViewController implements Initializable{
+
+	@FXML ImageView wallpaper;
+	
+	@FXML
+	private AnchorPane openPane;
+	@FXML
+	private AnchorPane gamePane;
+	@FXML
+	private AnchorPane bigBlack;
+	@FXML
+	private AnchorPane infoPane;
+	@FXML
+	private AnchorPane goldminerWinPane;
+	@FXML
+	private AnchorPane swinPane;
+	@FXML
+	private GridPane gameField;
+	@FXML
+	private GridPane myHand;
+	@FXML
+	private Label number;
+	@FXML
+	private Label dwarfType;
+	@FXML
+	private Label dwarfName;
+	private int num = 3;
+	
+	@FXML
+	private void minus(ActionEvent event) {
+		if(num > 3)
+		num--;
+		number.setText(String.valueOf(num));
+	}
+	
+	@FXML
+	private void plus(ActionEvent event) {
+		if(num < 10)
+		num++;
+		number.setText(String.valueOf(num));
+	}
+
+	private void switchTo(AnchorPane from, AnchorPane to) {
+		from.setVisible(false);
+		to.setVisible(true);
+	}
+	
+	private int actualPlayerNum = 0;
+	
+	private void initGamePage() {
+		ActualPlayer.set(Game.getPlayers().get(actualPlayerNum));
+		VisualTable.setAllEnable();
+		setPlayerDatas();
+		setHandField();
+	}
+	
+	private void setPlayerDatas() {
+		dwarfType.setText(ActualPlayer.get().getType());
+		dwarfName.setText(ActualPlayer.get().getDwarfName());
+	}
+	private void setGameField() {
+		Table.initTable();
+		Table.printTableTypes();
+		for(int i = 0; i < 5; i++) {
+				for(int j = 0; j < 10; j++) {
+					Button fieldButton = new Button();									
+					VisualTableElement actual = new VisualTableElement(i, j, fieldButton);
+					VisualTable.addNewElement(actual);
+					gameField.add(fieldButton, i, j);
+				}}	
+	}
+	
+	
+	private void setHandField() {
+		int num = 0;
+		
+		for(int i = 0; i < 2; i++) {
+			for(int j = 0; j < 3; j++) {
+				MyHandElement myhand = new MyHandElement(new Button(), num);
+				myHand.add(myhand.getButton(), i, j);
+				num++;				
+			}}
+	}
+	
+	@FXML
+	private void initPlayers(ActionEvent event) {
+		/**
+		 * This button set the players number,
+		 * set the players hand and
+		 * initialize the first page,
+		 * than switch to the bigBlack
+		 */
+		Game.setPlayerNum(num);
+		Game.fillPlayers();
+		
+		for (Player plyer : Game.getPlayers()) {
+			plyer.setHand();
+		}
+		switchTo(openPane, bigBlack);	
+	}
+	
+	
+	@FXML
+	private void flip(ActionEvent event) {
+	//	ActualPlayer.get().flipAll();
+	//	setHandField();
+	}
+	
+	@FXML
+	private void infoButton(ActionEvent event) {
+		switchTo(openPane, infoPane);
+	}
+	
+	@FXML
+	private void infoBack(ActionEvent event) {
+		switchTo(infoPane, openPane);
+	}
+	
+	
+	
+	@FXML
+	private void nextPlayerButton(ActionEvent event) {
+		if(actualPlayerNum < Game.getPlayerNum()-1)
+			actualPlayerNum++;
+		else actualPlayerNum = 0;
+		
+		if(WinTest.win() == 1 || WinTest.win() == 2) {
+			if(WinTest.win() == 1)
+				switchTo(gamePane, goldminerWinPane);
+			if(WinTest.win() == 2)
+				switchTo(gamePane, swinPane);
+			}
+		else switchTo(gamePane, bigBlack);
+	}
+	
+	@FXML
+	private void showNext(ActionEvent event) {		
+		initGamePage();
+		switchTo(bigBlack, gamePane);
+	}
+	
+	
+	@Override
+	public void initialize(URL location, ResourceBundle resources) {
+		wallpaper.setStyle("-fx-background-image: url('" + "picture2" + ".jpg"+"')");
+		setGameField();
+		Deck.fillTheDeckWithBasic();		
+	}
+}package application;
+
+import javafx.scene.control.Button;
+import service_layer_cards.CardType;
+import service_layer_cards.WayCard;
+import service_layer_physics.Deck;
+import service_layer_physics.Table;
+
+public class VisualTableElement {
+	private WayCard cd;
+	private int x;
+	private int y;
+	private Button b;
+	
+	public VisualTableElement(int x, int y, Button b) {
+		super();	
+		this.x = x;
+		this.y = y;
+		this.b = b;
+		
+		setCard();
+		setButton();
+	}
+	
+	private void setButton() {
+		b.setMinSize(120, 80);
+				
+		ImageSetter.setImageOnTable(b, cd.getCardType().toString());	
+		
+		b.setOnAction((event) -> {
+				
+			if(Table.checkConnection(SelectedWayCard.get(), x, y) &&
+			   VisualTable.getElementByCoordinates(x, y).getCd().getCardType() != CardType.WAYCARD) {
+				
+				Table.setTableElement(SelectedWayCard.get(), x, y);
+				setCard();
+				WayCard wc = (WayCard) cd;
+				ImageSetter.setImageOnTable(b, wc.getWayCardType().toString());
+				VisualTable.setAllDisable();
+								
+				
+				ActualPlayer.get().useOneCardFromHand(cd);
+				
+				
+				ActualPlayer.get().pickACard();
+				
+				System.out.println("Pakli:" + Deck.getDeckSize());
+			}
+		});
+	}
+	
+	private void setCard() {
+		cd = Table.getTableElement(x, y);
+	}
+
+	public WayCard getCd() {
+		return cd;
+	}
+
+	public int getX() {
+		return x;
+	}
+
+	public  int getY() {
+		return y;
+	}
+
+	public Button getButton() {
+		return b;
+	}
+}
+package application;
+
+public class VisualTable {
+
+	
+	private static VisualTableElement[][] visualTable = new VisualTableElement[5][10];
+	
+	public static void addNewElement(VisualTableElement vte) {
+		visualTable[vte.getX()][vte.getY()] = vte;
+	}
+	
+	public static VisualTableElement getElementByCoordinates(int x, int y) {
+		VisualTableElement vte = null;
+		if(x <= 4 && x >= 0 && y <= 9 && y >= 0)
+			vte = visualTable[x][y];
+		return vte;
+	}
+	
+	public static void setAllDisable() {
+		
+		for (VisualTableElement[] vTes : visualTable) {
+			for (VisualTableElement vTe : vTes) {
+				vTe.getButton().setDisable(true);
+			}
+		}
+		
+	}
+	
+	public static void setAllEnable() {
+		for (VisualTableElement[] vTes : visualTable) {
+			for (VisualTableElement vTe : vTes) {
+				vTe.getButton().setDisable(false);
+			}
+		}
+	}
+	
+}
+package service_layer_cards;
+
+public class WayCard extends Card{
+
+	private boolean right, left, up, down;
+	private boolean flipped = false;
+	
+	
+	private WayCardType wayCardType;
+	
+	public WayCard(int wayCardNumType) {
+		super();
+		
+		super.cardType = CardType.WAYCARD;
+
+		setType(wayCardNumType);
+	}
+	
+	
+	protected void setType(int wayCardNumType) {
+		switch (wayCardNumType) {
+		case 1: initType_1(); this.wayCardType = WayCardType.TYPE_1; break;
+		case 2: initType_2(); this.wayCardType = WayCardType.TYPE_2; break;
+		case 3: initType_3(); this.wayCardType = WayCardType.TYPE_3; break;
+		case 4: initType_4(); this.wayCardType = WayCardType.TYPE_4; break;
+		case 5: initType_5(); this.wayCardType = WayCardType.TYPE_5; break;
+		case 6: initType_6(); this.wayCardType = WayCardType.TYPE_6; break;
+		case 7: initType_7(); this.wayCardType = WayCardType.TYPE_7; break;
+		}
+	}
+	
+	public WayCard() {
+		right = false;
+		left = false;
+		up = false;
+		down = false;
+	};
+
+	public WayCardType getWayCardType() {
+		return wayCardType;
+	}
+	
+	public boolean isRight() {
+		return right;
+	}
+	public boolean isLeft() {
+		return left;
+	}
+	public boolean isUp() {
+		return up;
+	}
+	public boolean isDown() {
+		return down;
+	}
+	public String getOrientations() {
+		StringBuffer sb = new StringBuffer();
+		
+		sb.append("UP: ");
+		sb.append(up);
+		sb.append(" DOWN: ");
+		sb.append(down);
+		sb.append(" RIGHT: ");
+		sb.append(right);
+		sb.append(" LEFT: ");
+		sb.append(left);
+		
+		return sb.toString();
+	}
+	
+	private void initType_1() {
+		right = true;
+		left = false;
+		up = true;
+		down = false;
+	}
+	private void initType_2() {
+		right = true;
+		left = true;
+		up = true;
+		down = true;
+	}
+	private void initType_3() {
+		left = true;
+		right = true;
+		up = false;
+		down = false;
+	}
+	private void initType_4() {
+		down = true;
+		right = true;
+		up = false;
+		left = false;
+	}
+	private void initType_5() {
+		left = true;
+		right = true;
+		down = true;
+		up = false;
+	}
+	private void initType_6() {
+		up = true;
+		down = true;
+		left = false;
+		right = false;
+	}
+	private void initType_7() {
+		up = true;
+		down = true;
+		right = true;
+		left = false;
+	}
+	
+	public boolean canConnectTo(WayCard otherCard, Orientation o) {
+		if(this.down && otherCard.isUp() && o == Orientation.DOWN) { System.out.println("this.down && otherCard.isUp()");
+			return true;}
+		if(this.up && otherCard.isDown() && o == Orientation.UP) { System.out.println("this.up && otherCard.isDown()");
+			return true;}
+		if(this.right && otherCard.isLeft() && o == Orientation.RIGHT){ System.out.println("this.right && otherCard.isLeft()");
+			return true;}
+		if(this.left && otherCard.isRight() && o == Orientation.LEFT) { System.out.println("this.left && otherCard.isRight()");
+			return true;}
+
+		return false;
+		
+	}
+	
+	public void flip() {
+		
+		flipped = !flipped;
+		
+		System.out.println(flipped);
+	}
+	
+	public boolean isFlipped() {
+		return flipped;
+	}
+}
+package tests;
+
+//import static org.junit.jupiter.api.Assertions.*;
+
+import java.util.ArrayList;
+
+import org.junit.jupiter.api.Test;
+
+import service_layer_cards.Card;
+import service_layer_cards.WayCard;
+import service_layer_physics.Deck;
+import service_layer_physics.Game;
+import service_layer_players.Player;
+
+class WayCardTest {
+
+	@Test
+	void testConnectToOtherCardWithOrientation() {
+		WayCard wc01 = new WayCard(1);
+		WayCard wc02 = new WayCard(2);
+		
+	//	assertEquals(true, wc01.canConnectTo(wc02, "DOWN"), "Type 1 to type 2, down");
+	//	assertEquals(false, wc01.canConnectTo(wc02, "UP"), "Type 1 to type 2, up");
+	//	assertEquals(false, wc01.canConnectTo(wc02, "LEFT"), "Type 1 to type 2, left");
+	//	assertEquals(true, wc01.canConnectTo(wc02, "RIGHT"), "Type 1 to type 2, right");
+	}
+	
+	
+	@Test
+	void flipTest() {
+		
+		WayCard wc01 = new WayCard(2);
+	}
+	
+	
+	@Test
+	void allOfDoneTest() {
+
+		for(int i = 0; i < 41; i++) {
+			int val;
+			if(i%7 == 0) {
+				val = 1;
+			}
+			else if (i%7 == 1){
+				val = 2;
+			}
+			else if(i%7 == 2) {
+				val = 3;
+			}
+			else if(i%7 == 3) {
+				val = 4;
+			}
+			else if(i%7 == 4) {
+				val = 5;
+			}
+			else if(i%7 == 5) {
+				val = 6;
+			}
+			else val = 7;
+			
+			WayCard wc = new WayCard(val);
+			Deck.fillTheDeck(wc);
+		}
+		
+		Game.setPlayerNum(3);
+		Game.fillPlayers();
+		Game.printPlayersType();
+		
+		ArrayList<Player> gamers = Game.getPlayers();
+		
+		for (Player player : gamers) {
+			player.setHand();
+		}
+		System.out.println();
+		for (Player player : gamers) {
+			System.out.print(player.getType() + ": ");
+			ArrayList<Card> ezaHand = player.getHand();
+			for (Card kartya : ezaHand) {
+				if(kartya.getClass().equals((new WayCard()).getClass()))
+				{	WayCard wc = (WayCard) kartya;
+					System.out.print(wc.getWayCardType() + " ");
+				}
+			}
+			System.out.println();
+		}
+		
+		System.out.println(Deck.getDeckSize());
+	}
+	
+	
+
+}
+package service_layer_cards;
+
+public enum WayCardType {
+
+	/*BEFEJEZNI!!*/
+	BASIC, TYPE_1, TYPE_2, TYPE_3, TYPE_4, TYPE_5, TYPE_6, TYPE_7 
+}package service_layer_physics;
+
+import service_layer_cards.CardType;
+import service_layer_cards.GoldCard;
+
+public class WinTest {
+
+	public static int win() {
+		GoldCard gc = GoldCard.getSingleton();
+
+		System.out.println(gc.getOrientations());
+		int x;
+		int y = 9;
+		
+		if(Table.getTableElement(0, y).getCardType() == CardType.GOLD) x = 0;
+		else if(Table.getTableElement(2, y).getCardType() == CardType.GOLD) x = 2;
+		else x = 4;
+		if(Table.checkConnection(gc, x, y))
+			return 1;
+		
+		
+		int stone1, stone2;
+		
+		if(x == 0) {stone1 = 2; stone2 = 4;}
+		if(x == 2) {stone1 = 0; stone2 = 4;}
+		else {stone1 = 0; stone2 = 2;}
+		
+		if(Table.checkConnection(Table.getTableElement(stone1, y), stone1, y) ||
+		   Table.checkConnection(Table.getTableElement(stone2, y), stone2, y)
+				)
+			return 2;
+		
+		
+		else return 0;
+	}	
+}<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.paint.*?>
+<?import javafx.geometry.*?>
+<?import javafx.scene.shape.*?>
+<?import javafx.scene.effect.*?>
+<?import javafx.scene.text.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.image.*?>
+<?import java.lang.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.layout.AnchorPane?>
+
+<AnchorPane maxHeight="768.0" maxWidth="1024.0" minHeight="768.0" minWidth="1024.0" prefHeight="768.0" prefWidth="1024.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="application.ViewController">
+   <children>
+      <AnchorPane id="openPane" fx:id="openPane" layoutX="251.0" layoutY="519.0" prefHeight="768.0" prefWidth="1360.0" AnchorPane.bottomAnchor="160.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="219.0" AnchorPane.topAnchor="0.0">
+         <children>
+            <ImageView id="wallpaper" fx:id="wallpaper" fitHeight="768.0" fitWidth="1360.0" pickOnBounds="true" preserveRatio="true">
+               <image>
+                  <Image url="@../../bin/img/picture.jpg" />
+               </image>
+            </ImageView>
+            <Button layoutX="632.0" layoutY="575.0" mnemonicParsing="false" onAction="#initPlayers" opacity="0.0" prefHeight="191.0" prefWidth="392.0" style="-fx-background-color: darkorange;" textFill="WHITE">
+               <font>
+                  <Font size="41.0" />
+               </font>
+            </Button>
+            <Button layoutX="158.0" layoutY="561.0" mnemonicParsing="false" onAction="#minus" opacity="0.59" prefHeight="100.0" prefWidth="101.0" style="-fx-background-color: none;" text="-" textAlignment="CENTER" textFill="#322615">
+               <font>
+                  <Font size="54.0" />
+               </font>
+            </Button>
+            <Label fx:id="number" alignment="CENTER" contentDisplay="CENTER" layoutX="157.0" layoutY="477.0" opacity="0.59" prefHeight="114.0" prefWidth="112.0" text="3" textAlignment="CENTER" textFill="#322615">
+               <font>
+                  <Font size="96.0" />
+               </font>
+            </Label>
+            <Button layoutX="161.0" layoutY="397.0" mnemonicParsing="false" onAction="#plus" opacity="0.59" prefHeight="100.0" prefWidth="91.0" style="-fx-background-color: none;" text="+" textAlignment="CENTER" textFill="#322615">
+               <font>
+                  <Font size="46.0" />
+               </font>
+            </Button>
+            <Button id="info" fx:id="info" layoutX="907.0" layoutY="455.0" mnemonicParsing="false" onAction="#infoButton" opacity="0.28" prefHeight="89.0" prefWidth="103.0" style="-fx-background-color: gray;" text="i" textAlignment="CENTER" textFill="#110000">
+               <font>
+                  <Font name="System Bold" size="53.0" />
+               </font>
+            </Button>
+         </children>
+      </AnchorPane>
+      <AnchorPane id="gamePane" fx:id="gamePane" prefHeight="768.0" prefWidth="1024.0" visible="false" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+         <children>
+            <Rectangle fx:id="FLIP" arcHeight="5.0" arcWidth="5.0" height="768.0" layoutX="-2.0" stroke="BLACK" strokeType="INSIDE" width="1025.0">
+               <fill>
+                  <LinearGradient endX="1.0" endY="1.0">
+                     <stops>
+                        <Stop color="#9a4213" />
+                        <Stop color="#1b1111" offset="1.0" />
+                     </stops>
+                  </LinearGradient>
+               </fill>
+            </Rectangle>
+            <VBox layoutX="590.0" layoutY="19.0" prefHeight="114.0" prefWidth="425.0">
+               <children>
+                  <Label id="dwarfName" fx:id="dwarfName" alignment="CENTER" contentDisplay="CENTER" prefHeight="66.0" prefWidth="536.0" text="DwarfName" textFill="WHITE">
+                     <font>
+                        <Font name="Liberation Mono Bold" size="51.0" />
+                     </font>
+                  </Label>
+                  <Label id="dwarfType" fx:id="dwarfType" alignment="CENTER" contentDisplay="CENTER" prefHeight="29.0" prefWidth="547.0" text="DwarfType" textFill="WHITE">
+                     <font>
+                        <Font name="Liberation Mono Bold" size="23.0" />
+                     </font>
+                  </Label>
+               </children>
+            </VBox>
+            <Button id="nextPlayer" alignment="CENTER" layoutX="633.0" layoutY="683.0" mnemonicParsing="false" onAction="#nextPlayerButton" opacity="0.49" prefHeight="64.0" prefWidth="332.0" style="-fx-background-color: black;" text="Következő" textFill="WHITE">
+               <font>
+                  <Font size="34.0" />
+               </font>
+            </Button>
+            <GridPane id="gameField" fx:id="gameField" gridLinesVisible="true" layoutX="-3.0" layoutY="-15.0" prefHeight="739.0" prefWidth="562.0" scaleX="0.9" scaleY="0.9">
+              <columnConstraints>
+                  <ColumnConstraints hgrow="SOMETIMES" maxWidth="120.0" minWidth="120.0" prefWidth="120.0" />
+                  <ColumnConstraints hgrow="SOMETIMES" maxWidth="120.0" minWidth="120.0" prefWidth="120.0" />
+                  <ColumnConstraints hgrow="SOMETIMES" maxWidth="120.0" minWidth="120.0" prefWidth="120.0" />
+                  <ColumnConstraints hgrow="SOMETIMES" maxWidth="120.0" minWidth="120.0" prefWidth="120.0" />
+                  <ColumnConstraints hgrow="SOMETIMES" maxWidth="120.0" minWidth="120.0" prefWidth="120.0" />
+              </columnConstraints>
+              <rowConstraints>
+                  <RowConstraints maxHeight="80.0" minHeight="80.0" prefHeight="80.0" vgrow="SOMETIMES" />
+                  <RowConstraints maxHeight="80.0" minHeight="80.0" prefHeight="80.0" vgrow="SOMETIMES" />
+                  <RowConstraints maxHeight="80.0" minHeight="80.0" prefHeight="80.0" vgrow="SOMETIMES" />
+                  <RowConstraints maxHeight="80.0" minHeight="80.0" prefHeight="80.0" vgrow="SOMETIMES" />
+                  <RowConstraints maxHeight="80.0" minHeight="80.0" prefHeight="80.0" vgrow="SOMETIMES" />
+                  <RowConstraints maxHeight="80.0" minHeight="80.0" prefHeight="80.0" vgrow="SOMETIMES" />
+                  <RowConstraints maxHeight="80.0" minHeight="80.0" prefHeight="80.0" vgrow="SOMETIMES" />
+                  <RowConstraints maxHeight="80.0" minHeight="80.0" prefHeight="80.0" vgrow="SOMETIMES" />
+                  <RowConstraints maxHeight="80.0" minHeight="80.0" prefHeight="80.0" vgrow="SOMETIMES" />
+                  <RowConstraints maxHeight="80.0" minHeight="80.0" prefHeight="80.0" vgrow="SOMETIMES" />
+              </rowConstraints>
+            </GridPane>
+            <GridPane id="myHand" fx:id="myHand" alignment="CENTER_LEFT" gridLinesVisible="true" hgap="10.0" layoutX="555.0" layoutY="105.0" prefHeight="82.0" prefWidth="266.0" scaleX="0.85" scaleY="0.85" vgap="10.0">
+              <columnConstraints>
+                <ColumnConstraints hgrow="SOMETIMES" minWidth="240.0" prefWidth="240.0" />
+                <ColumnConstraints hgrow="SOMETIMES" minWidth="240.0" prefWidth="240.0" />
+              </columnConstraints>
+              <rowConstraints>
+                <RowConstraints minHeight="160.0" prefHeight="160.0" vgrow="SOMETIMES" />
+                <RowConstraints minHeight="160.0" prefHeight="160.0" vgrow="SOMETIMES" />
+                <RowConstraints minHeight="160.0" prefHeight="160.0" vgrow="SOMETIMES" />
+              </rowConstraints>
+            </GridPane>
+            <Button id="flip" fx:id="flip" layoutX="758.0" layoutY="603.0" mnemonicParsing="false" onAction="#flip" opacity="0.49" prefHeight="45.0" prefWidth="91.0" style="-fx-background-color: black;" text="FLIP" textFill="WHITE">
+               <font>
+                  <Font size="24.0" />
+               </font>
+            </Button>
+         </children>
+      </AnchorPane>
+      <AnchorPane id="bigBlack" fx:id="bigBlack" prefHeight="768.0" prefWidth="1024.0" visible="false" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+         <children>
+            <ImageView fitHeight="768.0" fitWidth="1024.0" pickOnBounds="true" preserveRatio="true">
+               <image>
+                  <Image url="@../../bin/img/iamhere.png" />
+               </image>
+            </ImageView>
+            <Button alignment="CENTER" contentDisplay="CENTER" mnemonicParsing="false" onAction="#showNext" opacity="0.0" prefHeight="768.0" prefWidth="1024.0" textAlignment="CENTER">
+               <font>
+                  <Font size="31.0" />
+               </font>
+            </Button>
+         </children>
+      </AnchorPane>
+      <AnchorPane id="goldminerWinPane" fx:id="goldminerWinPane" prefHeight="493.0" prefWidth="859.0" visible="false">
+         <children>
+            <ImageView fitHeight="768.0" fitWidth="1024.0" layoutX="1.0" pickOnBounds="true" preserveRatio="true">
+               <image>
+                  <Image url="@../../bin/img/gmwin.png" />
+               </image>
+            </ImageView>
+         </children>
+      </AnchorPane>
+      <AnchorPane id="swinPane" fx:id="swinPane" layoutX="10.0" layoutY="10.0" prefHeight="493.0" prefWidth="859.0" visible="false">
+         <children>
+            <ImageView fitHeight="768.0" fitWidth="1024.0" layoutX="-10.0" layoutY="-12.0" pickOnBounds="true" preserveRatio="true">
+               <image>
+                  <Image url="@../../bin/img/swin.png" />
+               </image>
+            </ImageView>
+         </children>
+      </AnchorPane>
+      <AnchorPane id="infoPane" fx:id="infoPane" prefHeight="200.0" prefWidth="200.0" visible="false">
+         <children>
+            <ImageView fitHeight="768.0" fitWidth="1024.0" pickOnBounds="true" preserveRatio="true">
+               <image>
+                  <Image url="@../../bin/img/info.png" />
+               </image>
+            </ImageView>
+            <Button id="infoBack" fx:id="infoBack" layoutX="419.0" layoutY="667.0" mnemonicParsing="false" onAction="#infoBack" prefHeight="66.0" prefWidth="188.0" style="-fx-background-color: none;" />
+         </children></AnchorPane>
+   </children>
+</AnchorPane>

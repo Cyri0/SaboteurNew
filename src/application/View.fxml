@@ -1,0 +1,182 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.paint.*?>
+<?import javafx.geometry.*?>
+<?import javafx.scene.shape.*?>
+<?import javafx.scene.effect.*?>
+<?import javafx.scene.text.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.image.*?>
+<?import java.lang.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.layout.AnchorPane?>
+
+<AnchorPane maxHeight="768.0" maxWidth="1024.0" minHeight="768.0" minWidth="1024.0" prefHeight="768.0" prefWidth="1024.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="application.ViewController">
+   <children>
+      <AnchorPane id="openPane" fx:id="openPane" layoutX="251.0" layoutY="519.0" prefHeight="768.0" prefWidth="1360.0" AnchorPane.bottomAnchor="160.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="219.0" AnchorPane.topAnchor="0.0">
+         <children>
+            <ImageView id="wallpaper" fx:id="wallpaper" fitHeight="768.0" fitWidth="1360.0" pickOnBounds="true" preserveRatio="true">
+               <image>
+                  <Image url="@../img/picture.jpg" />
+               </image>
+            </ImageView>
+            <Button layoutX="632.0" layoutY="575.0" mnemonicParsing="false" onAction="#initPlayers" opacity="0.0" prefHeight="191.0" prefWidth="392.0" style="-fx-background-color: darkorange;" textFill="WHITE">
+               <font>
+                  <Font size="41.0" />
+               </font>
+            </Button>
+            <Button layoutX="158.0" layoutY="561.0" mnemonicParsing="false" onAction="#minus" opacity="0.59" prefHeight="100.0" prefWidth="101.0" style="-fx-background-color: none;" text="-" textAlignment="CENTER" textFill="#322615">
+               <font>
+                  <Font size="54.0" />
+               </font>
+            </Button>
+            <Label fx:id="number" alignment="CENTER" contentDisplay="CENTER" layoutX="157.0" layoutY="477.0" opacity="0.59" prefHeight="114.0" prefWidth="112.0" text="3" textAlignment="CENTER" textFill="#322615">
+               <font>
+                  <Font size="96.0" />
+               </font>
+            </Label>
+            <Button layoutX="161.0" layoutY="397.0" mnemonicParsing="false" onAction="#plus" opacity="0.59" prefHeight="100.0" prefWidth="101.0" style="-fx-background-color: none;" text="+" textAlignment="CENTER" textFill="#322615">
+               <font>
+                  <Font size="46.0" />
+               </font>
+            </Button>
+            <Button id="info" fx:id="info" layoutX="907.0" layoutY="455.0" mnemonicParsing="false" onAction="#infoButton" opacity="0.28" prefHeight="89.0" prefWidth="103.0" style="-fx-background-color: gray;" text="i" textAlignment="CENTER" textFill="#110000">
+               <font>
+                  <Font name="System Bold" size="53.0" />
+               </font>
+            </Button>
+            <Label layoutX="24.0" layoutY="735.0" prefHeight="29.0" prefWidth="300.0" text="2020.05.15. Version 1.0.1 (1st version: 2018.05.13.)" textFill="WHITE" />
+         </children>
+      </AnchorPane>
+      <AnchorPane id="gamePane" fx:id="gamePane" prefHeight="768.0" prefWidth="1024.0" visible="false" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+         <children>
+            <Rectangle arcHeight="5.0" arcWidth="5.0" height="768.0" layoutX="-2.0" stroke="BLACK" strokeType="INSIDE" width="1025.0">
+               <fill>
+                  <LinearGradient endX="1.0" endY="1.0">
+                     <stops>
+                        <Stop color="#9a4213" />
+                        <Stop color="#1b1111" offset="1.0" />
+                     </stops>
+                  </LinearGradient>
+               </fill>
+            </Rectangle>
+            <VBox layoutX="590.0" layoutY="19.0" prefHeight="114.0" prefWidth="425.0">
+               <children>
+                  <Label id="dwarfName" fx:id="dwarfName" alignment="CENTER" contentDisplay="CENTER" prefHeight="66.0" prefWidth="536.0" text="DwarfName" textFill="WHITE">
+                     <font>
+                        <Font name="Liberation Mono Bold" size="51.0" />
+                     </font>
+                  </Label>
+                  <Label id="dwarfType" fx:id="dwarfType" alignment="CENTER" contentDisplay="CENTER" prefHeight="29.0" prefWidth="547.0" text="DwarfType" textFill="WHITE">
+                     <font>
+                        <Font name="Liberation Mono Bold" size="23.0" />
+                     </font>
+                  </Label>
+               </children>
+            </VBox>
+            <Button id="nextPlayer" alignment="CENTER" layoutX="633.0" layoutY="683.0" mnemonicParsing="false" onAction="#nextPlayerButton" opacity="0.49" prefHeight="64.0" prefWidth="332.0" style="-fx-background-color: black;" text="Next" textFill="WHITE">
+               <font>
+                  <Font size="34.0" />
+               </font>
+            </Button>
+            <GridPane id="gameField" fx:id="gameField" gridLinesVisible="true" layoutX="-3.0" layoutY="-15.0" prefHeight="739.0" prefWidth="562.0" scaleX="0.9" scaleY="0.9">
+              <columnConstraints>
+                  <ColumnConstraints hgrow="SOMETIMES" maxWidth="120.0" minWidth="120.0" prefWidth="120.0" />
+                  <ColumnConstraints hgrow="SOMETIMES" maxWidth="120.0" minWidth="120.0" prefWidth="120.0" />
+                  <ColumnConstraints hgrow="SOMETIMES" maxWidth="120.0" minWidth="120.0" prefWidth="120.0" />
+                  <ColumnConstraints hgrow="SOMETIMES" maxWidth="120.0" minWidth="120.0" prefWidth="120.0" />
+                  <ColumnConstraints hgrow="SOMETIMES" maxWidth="120.0" minWidth="120.0" prefWidth="120.0" />
+              </columnConstraints>
+              <rowConstraints>
+                  <RowConstraints maxHeight="80.0" minHeight="80.0" prefHeight="80.0" vgrow="SOMETIMES" />
+                  <RowConstraints maxHeight="80.0" minHeight="80.0" prefHeight="80.0" vgrow="SOMETIMES" />
+                  <RowConstraints maxHeight="80.0" minHeight="80.0" prefHeight="80.0" vgrow="SOMETIMES" />
+                  <RowConstraints maxHeight="80.0" minHeight="80.0" prefHeight="80.0" vgrow="SOMETIMES" />
+                  <RowConstraints maxHeight="80.0" minHeight="80.0" prefHeight="80.0" vgrow="SOMETIMES" />
+                  <RowConstraints maxHeight="80.0" minHeight="80.0" prefHeight="80.0" vgrow="SOMETIMES" />
+                  <RowConstraints maxHeight="80.0" minHeight="80.0" prefHeight="80.0" vgrow="SOMETIMES" />
+                  <RowConstraints maxHeight="80.0" minHeight="80.0" prefHeight="80.0" vgrow="SOMETIMES" />
+                  <RowConstraints maxHeight="80.0" minHeight="80.0" prefHeight="80.0" vgrow="SOMETIMES" />
+                  <RowConstraints maxHeight="80.0" minHeight="80.0" prefHeight="80.0" vgrow="SOMETIMES" />
+              </rowConstraints>
+            </GridPane>
+            <GridPane id="myHand" fx:id="myHand" alignment="CENTER_LEFT" gridLinesVisible="true" hgap="10.0" layoutX="560.0" layoutY="178.0" prefHeight="82.0" prefWidth="266.0" scaleX="0.85" scaleY="0.85" vgap="10.0">
+              <columnConstraints>
+                <ColumnConstraints hgrow="SOMETIMES" minWidth="240.0" prefWidth="240.0" />
+                <ColumnConstraints hgrow="SOMETIMES" minWidth="240.0" prefWidth="240.0" />
+              </columnConstraints>
+              <rowConstraints>
+                <RowConstraints minHeight="160.0" prefHeight="160.0" vgrow="SOMETIMES" />
+                <RowConstraints minHeight="160.0" prefHeight="160.0" vgrow="SOMETIMES" />
+                <RowConstraints minHeight="160.0" prefHeight="160.0" vgrow="SOMETIMES" />
+              </rowConstraints>
+            </GridPane>
+            <Label id="cardsInDeck" fx:id="cardsInDeck" layoutX="633.0" layoutY="162.0" text="Cards in Deck" textFill="WHITE">
+               <font>
+                  <Font size="23.0" />
+               </font>
+            </Label>
+         </children>
+      </AnchorPane>
+      <AnchorPane id="bigBlack" fx:id="bigBlack" prefHeight="768.0" prefWidth="1024.0" visible="false" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+         <children>
+            <ImageView fitHeight="768.0" fitWidth="1024.0" pickOnBounds="true" preserveRatio="true">
+               <image>
+                  <Image url="@../img/iamhere.png" />
+               </image>
+            </ImageView>
+            <Button alignment="CENTER" contentDisplay="CENTER" mnemonicParsing="false" onAction="#showNext" opacity="0.0" prefHeight="768.0" prefWidth="1024.0" textAlignment="CENTER">
+               <font>
+                  <Font size="31.0" />
+               </font>
+            </Button>
+         </children>
+      </AnchorPane>
+      <AnchorPane id="goldminerWinPane" fx:id="goldminerWinPane" prefHeight="493.0" prefWidth="859.0" visible="false">
+         <children>
+            <ImageView fitHeight="768.0" fitWidth="1024.0" layoutX="1.0" pickOnBounds="true" preserveRatio="true">
+               <image>
+                  <Image url="@../img/gmwin.png" />
+               </image>
+            </ImageView>
+            <Button id="highscoreButton" mnemonicParsing="false" onAction="#switchToScore" prefHeight="768.0" prefWidth="1025.0" style="-fx-background-color: none;" />
+         </children>
+      </AnchorPane>
+      <AnchorPane id="swinPane" fx:id="swinPane" layoutX="10.0" layoutY="10.0" prefHeight="493.0" prefWidth="859.0" visible="false">
+         <children>
+            <ImageView fitHeight="768.0" fitWidth="1024.0" layoutX="-10.0" layoutY="-12.0" pickOnBounds="true" preserveRatio="true">
+               <image>
+                  <Image url="@../img/swin.png" />
+               </image>
+            </ImageView>
+            <Button id="highscoreButton" mnemonicParsing="false" onAction="#switchToScore" prefHeight="768.0" prefWidth="1025.0" style="-fx-background-color: none;" />
+         </children>
+      </AnchorPane>
+      <AnchorPane id="infoPane" fx:id="infoPane" prefHeight="200.0" prefWidth="200.0" visible="false">
+         <children>
+            <ImageView fitHeight="768.0" fitWidth="1024.0" pickOnBounds="true" preserveRatio="true">
+               <image>
+                  <Image url="@../img/info.png" />
+               </image>
+            </ImageView>
+            <Button id="infoBack" fx:id="infoBack" layoutX="419.0" layoutY="667.0" mnemonicParsing="false" onAction="#infoBack" prefHeight="66.0" prefWidth="188.0" style="-fx-background-color: none;" />
+         </children></AnchorPane>
+      <AnchorPane id="scorePane" fx:id="scorePane" prefHeight="768.0" prefWidth="1024.0" visible="false">
+         <children>
+            <ImageView id="scoreWallpaper" fitHeight="768.0" fitWidth="1024.0" pickOnBounds="true" preserveRatio="true">
+               <image>
+                  <Image url="@../img/score.png" />
+               </image>
+            </ImageView>
+            <Label id="score" fx:id="score" layoutX="54.0" layoutY="33.0" prefHeight="564.0" prefWidth="248.0" style="-fx-font-family: Monospace; -fx-font-size: 18pt; -fx-font-weight: bold;" text="EZ ITT A SZÖVEG HELYE!" textFill="WHITE">
+               <font>
+                  <Font name="Khmer OS System" size="39.0" />
+               </font></Label>
+            <Button id="newGameButton" fx:id="newGameButton" layoutX="1.0" layoutY="599.0" mnemonicParsing="false" onAction="#newGame" opacity="0.3" prefHeight="169.0" prefWidth="1024.0" style="-fx-background-color: darkblue;" text="NEW GAME" textFill="WHITE">
+               <font>
+                  <Font size="43.0" />
+               </font></Button>
+         </children>
+      </AnchorPane>
+   </children>
+</AnchorPane>
